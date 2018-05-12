@@ -1,0 +1,79 @@
+---
+title: "Pump It Up - EDA"
+author: "Brian Gillis"
+date: "April 17, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(dplyr)
+library(caret)
+library(ggplot2)
+library(nnet)
+library(rpart)
+library(gridExtra)
+
+setwd('C:\\Users\\brian\\Pump-it-Up')
+
+```
+
+#Pump It Up!
+DrivenData - a data mining competition site much like Kaggle - has provided a challenge called Pump it Up: Data Mining the Water Table. The task for data miners working on Pump it Up is to use the data provided on Tanzanian water systems to classify wells into one of three status groups: "functional", "functional needs repair", or "non functional".  The Tanzanian Water Ministry has provided data with the hopes of creating a better understanding of which pumps fail which would aid their efforts to maintain safe drinking water for all Tanzanians.  Data is provided for nearly 60,000 wells with 40 different features with information on factors such as geography, water quality, and governance of the well.
+
+### Loading and some quick transformations
+I want to do the following:
+* Pull down the data from the website
+* connect the labels to the values
+* split the training into our own training (r) and test (e)
+
+```{r loading.the.data, include=FALSE}
+#   training.values <- 'https://s3.amazonaws.com/drivendata/data/7/public/4910797b-ee55-40a7-8668-10efd5c1b960.csv'
+#   training.labels <- 'https://s3.amazonaws.com/drivendata/data/7/public/0bf8bc6e-30d0-4c50-956a-603fc693d966.csv'
+#   test.values <- 'https://s3.amazonaws.com/drivendata/data/7/public/702ddfc5-68cd-4d1d-a0de-f5f566f76d91.csv'
+#   submission.format <- 'https://s3.amazonaws.com/drivendata/data/7/public/SubmissionFormat.csv'
+
+#   d <- read.csv(training.values)
+#   d.labels <- read.csv(training.labels)
+
+#   d <- d %>%
+#     left_join(d.labels)
+
+#   set.seed('3456')
+#   t.index <- createDataPartition(d$status_group, p= .75, list=FALSE, times=1)
+#   r <- d[t.index,]
+#   e <- d[-t.index,]
+
+# Save an object to a file
+#   saveRDS(r, file = "piu_r")
+#   saveRDS(e, file = "piu_e")
+# Restore the object
+r <- readRDS(file = "piu_r")
+e <- readRDS(file = "piu_e")
+```
+
+Though there are three categories, the "functional needs repair" group is small relative to the others.  The chart below shows the number of wells in each class for the training data.
+
+```{r}
+ggplot(data=r, aes(x=status_group)) +
+  geom_bar() +
+  theme(panel.background = element_blank()) +
+  labs(x="Functional Status", 
+       y="# of Wells",
+       title = "Functional Status of Wells",
+       subtitle = "Counts")
+
+ggplot(data=r, aes(x=longitude, y = latitude, color = status_group)) + 
+  geom_point(alpha =.5) +
+  coord_cartesian(xlim=c(29,40)) +
+  theme_void() +
+  labs(x="longitude", 
+       y="latitude",
+       title = "Functional Status of Wells",
+       subtitle = "Geography")
+
+
+       
+```
+
